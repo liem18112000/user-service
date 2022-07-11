@@ -1,0 +1,80 @@
+version: '3.8'
+services:
+  server-1:
+    image: consul
+    container_name: server-1
+    restart: always
+    networks:
+      - microservice
+    ports:
+      - "8500:8500"
+      - "8600:8600/tcp"
+      - "8600:8600/udp"
+    command: "agent -server -ui -node=server-1 -bootstrap-expect=1 -client=0.0.0.0"
+  database:
+    image: mysql:5.7
+    container_name: database
+    restart: always
+    networks:
+      - microservice
+    env_file: ./.env
+    environment:
+      - MYSQL_ROOT_PASSWORD=$DATABASE_PASS
+      - MYSQL_DATABASE=$DATABASE_NAME
+    ports:
+      - $DATABASE_PORT:$DATABASE_DOCKER_PORT
+    volumes:
+      - db:/var/lib/mysql
+  user-service:
+    container_name: asset-service
+    image: liem18112000/asset-service:1.0
+    depends_on:
+      - database
+      - server-1
+    build: .
+    restart: always
+    networks:
+      - microservice
+    env_file: ./.env
+    ports:
+      - $SERVER_PORT:$DOCKER_PORT
+    environment:
+      - CONSUL_ENABLED=$CONSUL_ENABLED
+      - CONSUL_HOST=$CONSUL_HOST
+      - CONSUL_PORT=$CONSUL_PORT
+      - DATABASE_DRIVER=$DATABASE_DRIVER
+      - DATABASE_JBDC=$DATABASE_JBDC
+      - DATABASE_HOST=$DATABASE_HOST
+      - DATABASE_USER=$DATABASE_USER
+      - DATABASE_PASS=$DATABASE_PASS
+      - DATABASE_NAME=$DATABASE_NAME
+      - DATABASE_PORT=$DATABASE_DOCKER_PORT
+      - LIQUIBASE_ENABLED=$LIQUIBASE_ENABLED
+      - LIQUIBASE_CHANGELOG=$LIQUIBASE_CHANGELOG
+      - LIQUIBASE_CONTEXTS=$LIQUIBASE_CONTEXTS
+    stdin_open: true
+    tty: true
+  rabbitmq:
+    container_name: rabbitmq
+    image: rabbitmq:3.9-management-alpine
+    environment:
+      - RABBITMQ_DEFAULT_USER=$RABBITMQ_DEFAULT_USER
+      - RABBITMQ_DEFAULT_PASS=$RABBITMQ_DEFAULT_PASS
+    ports:
+      # AMQP protocol port
+      - $RABBIT_PROTOCOL_SERVICE_PORT:$RABBIT_PROTOCOL_DOCKER_PORT
+      # HTTP management UI
+      - $RABBIT_UI_MANAGEMENT_SERVICE_PORT:$RABBIT_UI_MANAGEMENT_DOCKER_PORT
+  cache:
+    image: redis:6.2-alpine
+    restart: always
+    ports:
+      - '6379:6379'
+    command: redis-server --save 20 1 --loglevel warning --requirepass eYVX7EwVmmxKPCDmwMtyKVge8oLd2t81
+    volumes:
+      - cache:/data
+networks:
+  microservice:
+    driver: bridge
+volumes:
+  db:

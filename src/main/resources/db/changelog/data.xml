@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+  xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.0.xsd">
+
+  <changeSet id="1" author="liem" runOnChange="true" runInTransaction="false" labels="001_add_data_role_table">
+    <sqlFile path="../sql/data/001_add_data_role_table.sql" endDelimiter="\nGO" relativeToChangelogFile="true" />
+  </changeSet>
+
+  <changeSet id="2" author="liem" runOnChange="true" runInTransaction="false" labels="002_add_data_user_table">
+    <sqlFile path="../sql/data/002_add_data_user_table.sql" endDelimiter="\nGO" relativeToChangelogFile="true" />
+  </changeSet>
+
+  <changeSet id="3" author="liem" runOnChange="true" runInTransaction="false" labels="003_add_data_users_roles_table">
+    <sqlFile path="../sql/data/003_add_data_users_roles_table.sql" endDelimiter="\nGO" relativeToChangelogFile="true" />
+  </changeSet>
+
+  <changeSet id="4" author="liem" runOnChange="true" runInTransaction="false" labels="004_add_data_resource_table">
+    <sqlFile path="../sql/data/004_add_data_resource_table.sql" endDelimiter="\nGO" relativeToChangelogFile="true" />
+  </changeSet>
+
+  <changeSet id="5" author="liem" runOnChange="true" runInTransaction="false" labels="005_add_data_resources_roles_table">
+    <sqlFile path="../sql/data/005_add_data_resources_roles_table.sql" endDelimiter="\nGO" relativeToChangelogFile="true" />
+  </changeSet>
+
+</databaseChangeLog>

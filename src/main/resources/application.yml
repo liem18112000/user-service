@@ -1,0 +1,137 @@
+server:
+  port: ${SERVER_PORT:9091}
+  forward-headers-strategy: framework
+logging:
+  file:
+    path: ${LOG_PATH:logs}
+    name: ${logging.file.path}/${LOG_FILE:application}.log
+  logback:
+    rollingpolicy:
+      file-name-pattern: ${LOG_FILE:application}.%d{dd-MM-yyyy}.%i.log
+      max-file-size: ${LOG_MAX_FILE_SIZE:10MB}
+      max-history: ${LOG_MAX_HISTORY:20}
+  pattern:
+    console: "%green(%d{${ISO8601}}) %highlight(%-5level) [%blue(%t)] %yellow(%C{1.}): %msg%n%throwable"
+resilience4j:
+  circuitbreaker:
+    instances:
+      global:
+        register-health-indicator: true
+        sliding-window-type: COUNT_BASED
+        sliding-window-size: 3
+        failure-rate-threshold: 50
+        slow-call-rate-threshold: 50
+        permitted-number-of-calls-in-half-open-state: 1
+        max-wait-duration-in-half-open-state: 10s
+        wait-duration-in-open-state: 10s
+        slow-call-duration-threshold: 3s
+        writable-stack-trace-enabled: true
+        automatic-transition-from-open-to-half-open-enabled: true
+  timelimiter:
+    instances:
+      global:
+        register-health-indicator: true
+        timeoutDuration: 10s
+        cancelRunningFuture: true
+  retry:
+    instances:
+      global:
+        register-health-indicator: true
+        maxAttempts: 5
+        waitDuration: 30s
+        enableExponentialBackoff: true
+        exponentialBackoffMultiplier: 2
+  bulkhead:
+    instances:
+      global:
+        maxWaitDuration: 1s
+        maxConcurrentCalls: 20
+  thread-pool-bulkhead:
+    instances:
+      global:
+        maxThreadPoolSize: 10
+        coreThreadPoolSize: 3
+        queueCapacity: 5
+spring:
+  profiles:
+    active: ${ACTIVE_PROFILES:dev}
+  application:
+    name: ${APPLICATION_NAME:user-service}
+    server: ${APPLICATION_SERVER:localhost}
+    endpoint: ${spring.application.server}:${server.port}
+  jwt:
+    secret: ${JWT_SECRET:secret}
+    expiration: ${JWT_EXPIRATION:3600s}
+    cache-duration: ${JWT_CACHE_DURATION:1200s}
+    white-list: /auth/ping/no-auth,/webjars/**,/v3/api-docs,/v3/api-docs.*,/v3/api-docs/**,/swagger-ui.*,/swagger-ui/**,/actuator/health,/login,/login/**,/register,/register/**
+  rabbitmq:
+    host: ${RABBITMQ_HOST:localhost}
+    username: ${RABBITMQ_USERNAME:guest}
+    password: ${RABBITMQ_PASSWORD:guest}
+    port: ${RABBITMQ_PORT:5672}
+    exchange: ${RABBITMQ_EXCHANGE:service.user.exchange}
+    queue: ${RABBITMQ_QUEUE:service.user.queue}
+    routing-key: ${RABBITMQ_ROUTING_KEY:service.user.routing-key}
+    durable: ${RABBITMQ_DURABLE:true}
+    virtual-host: ${RABBITMQ_VHOST:/}
+    template:
+      reply-timeout: ${RABBITMQ_REPLY_TIMEOUT:15s}
+    listener:
+      simple:
+        retry:
+          max-attempts: ${RABBITMQ_RETRY_MAX_ATTEMPS:3}
+          enabled: ${RABBITMQ_RETRY_ENABLED:true}
+          max-interval: ${RABBITMQ_RETRY_MAX_INTERVAL:15s}
+          initial-interval: ${RABBITMQ_RETRY_INITIAL_INTERVAL:3s}
+    publisher-confirm-type: correlated
+    publisher-returns: true
+    cache:
+      connection:
+        mode: channel
+  config:
+    import: optional:consul:${CONSUL_HOST:localhost}:${CONSUL_PORT:8500}/
+  cloud:
+    consul:
+      host: ${CONSUL_HOST:localhost}
+      port: ${CONSUL_PORT:8500}
+      enabled: ${CONSUL_ENABLED:true}
+      config:
+        format: files
+        prefixes: ${CONSUL_CONFIGS_TAG:app/configs/${spring.application.name}}
+        watch:
+          delay: 5000
+      discovery:
+        register: ${CONSUL_DISCOVERY_ENABLES:true}
+        service-name: ${spring.application.name}
+        instance-id: ${spring.application.name}:${random.value}
+        tags:
+          - java
+          - spring
+          - user-service
+          - jwt
+  datasource:
+    driver-class-name: ${DATABASE_DRIVER:com.mysql.cj.jdbc.Driver}
+    url: jdbc:${DATABASE_JBDC:mysql}://${DATABASE_HOST:localhost}:${DATABASE_PORT:3306}/${DATABASE_NAME:user}
+    username: ${DATABASE_USER:root}
+    password: ${DATABASE_PASS:}
+  liquibase:
+    enabled: ${LIQUIBASE_ENABLED:true}
+    change-log: ${LIQUIBASE_CHANGELOG:classpath:/db/changelog-master.xml}
+    contexts: ${LIQUIBASE_CONTEXTS:default}
+  redis:
+    host: ${REDIS_HOST:localhost}
+    port: ${REDIS_PORT:6379}
+    connect-timeout: 30s
+    timeout: 10s
+    cache-duration:
+      users: ${USERS_CACHE_DURATION:600s}
+      roles: ${ROLES_CACHE_DURATION:600s}
+      resources: ${RESOURCES_CACHE_DURATION:1200s}
+---
+spring:
+  profiles: dev
+  jpa:
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
