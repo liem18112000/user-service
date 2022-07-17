@@ -1,6 +1,6 @@
 package com.liem.userservice.service.cache;
 
-import com.application.common.service.CacheService;
+import com.application.common.service.impl.AbstractCacheService;
 import java.io.Serializable;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +15,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 @RequiredArgsConstructor(onConstructor_={@Autowired})
 public abstract class AbstractRedisCacheService
     <KEY extends Serializable, VALUE>
-    implements CacheService<KEY, VALUE> {
+    extends AbstractCacheService<KEY, VALUE> {
 
   /**
    * The Template.

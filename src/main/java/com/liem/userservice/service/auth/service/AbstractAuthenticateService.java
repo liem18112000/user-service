@@ -12,12 +12,13 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 /**
  * The type Abstract authenticate service.
  *
- * @param <ID>    the type parameter
- * @param <TOKEN> the type parameter
+ * @param <CREDENTIAL> the type parameter
+ * @param <TOKEN>      the type parameter
  */
 @RequiredArgsConstructor(onConstructor_={@Autowired})
 public abstract class AbstractAuthenticateService
-    <TOKEN extends Serializable> implements AuthenticateService<TOKEN> {
+    <CREDENTIAL extends Serializable, TOKEN extends Serializable>
+    implements AuthenticateService<CREDENTIAL, TOKEN> {
 
   /**
    * The Authentication manager.

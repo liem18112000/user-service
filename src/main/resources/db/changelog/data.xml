@@ -24,4 +24,8 @@
     <sqlFile path="../sql/data/005_add_data_resources_roles_table.sql" endDelimiter="\nGO" relativeToChangelogFile="true" />
   </changeSet>
 
+  <changeSet id="6" author="liem" runOnChange="true" runInTransaction="false" labels="006_add_data_refresh_token_table">
+    <sqlFile path="../sql/data/006_add_data_refresh_token_table.sql" endDelimiter="\nGO" relativeToChangelogFile="true" />
+  </changeSet>
+
 </databaseChangeLog>

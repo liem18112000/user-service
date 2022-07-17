@@ -13,5 +13,10 @@ public enum UserMessageType {
   /**
    * Register user message type.
    */
-  REGISTER
+  REGISTER,
+
+  /**
+   * Refresh access token user message type.
+   */
+  REFRESH_ACCESS_TOKEN
 }

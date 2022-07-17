@@ -1,6 +1,7 @@
 package com.liem.userservice.service.cache;
 
 import java.time.Duration;
+import java.util.function.Supplier;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import org.springframework.data.redis.core.RedisTemplate;

@@ -4,6 +4,7 @@ import com.application.common.entity.BaseEntity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.liem.userservice.entity.listener.UserEntityListener;
 import java.io.Serializable;
+import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -73,7 +74,7 @@ public class UserEntity extends BaseEntity<Long> implements Serializable, Clonea
       joinColumns = @JoinColumn(name = "user_id"),
       inverseJoinColumns = @JoinColumn(name = "role_id"))
   @Exclude
-  private Set<RoleEntity> roles;
+  private Set<RoleEntity> roles = new HashSet<>();
 
   /**
    * Gets granted authorities.

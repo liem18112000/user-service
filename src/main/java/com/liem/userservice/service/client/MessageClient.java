@@ -47,6 +47,21 @@ public class MessageClient
   private final RabbitTemplate rabbitTemplate;
 
   /**
+   * Refresh access token base message.
+   *
+   * @param dto the dto
+   * @return the base message
+   */
+  public BaseMessage<DTO> refreshAccessToken(DTO dto) {
+    return getMessageClientTemplate(() -> {
+      var request = prepareRequest(dto,
+          UserMessageType.REFRESH_ACCESS_TOKEN.name());
+      log.info("Refresh access token: {}", request);
+      return request;
+    }, this::handleFailedRequest);
+  }
+
+  /**
    * Authenticate base message.
    *
    * @param dto the dto

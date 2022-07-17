@@ -4,10 +4,12 @@ import static com.application.common.service.util.ServiceUtil.throwExceptionForN
 import static com.application.common.service.util.ServiceUtil.validateNotNull;
 
 import com.application.common.service.impl.BaseCommandService;
+import com.liem.userservice.dto.token.RefreshTokenDto;
 import com.liem.userservice.dto.user.UserDto;
 import com.liem.userservice.entity.UserEntity;
 import com.liem.userservice.mapper.UserMapper;
 import com.liem.userservice.repository.UserRepository;
+import com.liem.userservice.service.command.RefreshTokenCommandService;
 import com.liem.userservice.service.command.UserCommandService;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.rest.core.event.AfterCreateEvent;
@@ -16,6 +18,7 @@ import org.springframework.data.rest.core.event.BeforeCreateEvent;
 import org.springframework.data.rest.core.event.BeforeSaveEvent;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * The type User command service.
@@ -32,18 +35,28 @@ public class UserCommandServiceImpl
   protected final PasswordEncoder passwordEncoder;
 
   /**
+   * The Token command service.
+   */
+  protected final RefreshTokenCommandService tokenCommandService;
+
+  /**
    * Instantiates a new User command service.
    *
-   * @param userRepository  the user repository
-   * @param mapper          the mapper
-   * @param publisher       the publisher
-   * @param passwordEncoder the password encoder
+   * @param userRepository      the user repository
+   * @param mapper              the mapper
+   * @param publisher           the publisher
+   * @param passwordEncoder     the password encoder
+   * @param tokenCommandService the token command service
    */
-  public UserCommandServiceImpl(UserRepository userRepository,
-      UserMapper mapper, ApplicationEventPublisher publisher,
-      PasswordEncoder passwordEncoder) {
+  public UserCommandServiceImpl(
+      UserRepository userRepository,
+      UserMapper mapper,
+      ApplicationEventPublisher publisher,
+      PasswordEncoder passwordEncoder,
+      RefreshTokenCommandService tokenCommandService) {
     super(userRepository, mapper, publisher);
     this.passwordEncoder = passwordEncoder;
+    this.tokenCommandService = tokenCommandService;
   }
 
   /**
@@ -53,6 +66,7 @@ public class UserCommandServiceImpl
    * @return the dto
    */
   @Override
+  @Transactional
   public UserDto<Long> create(UserDto<Long> dto) {
     validateNotNull(dto, "DTO");
     var entityToCreate = this.mapper.mapToEntity(dto);
@@ -60,6 +74,10 @@ public class UserCommandServiceImpl
     publisher.publishEvent(new BeforeCreateEvent(entityToCreate));
     final var createdEntity = this.repo.save(entityToCreate);
     publisher.publishEvent(new AfterCreateEvent(createdEntity));
+    final var tokenDto = new RefreshTokenDto<Long>();
+    tokenDto.setUser(this.mapper.mapToDto(createdEntity));
+    final var tokenToCreate = this.tokenCommandService.create(tokenDto);
+    publisher.publishEvent(new AfterCreateEvent(tokenToCreate));
     return this.mapper.mapToDto(createdEntity);
   }
 

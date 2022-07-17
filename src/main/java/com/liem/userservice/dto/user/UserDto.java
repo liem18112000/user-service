@@ -1,6 +1,8 @@
 package com.liem.userservice.dto.user;
 
 import com.application.common.dto.BaseDto;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.liem.userservice.dto.role.RoleDto;
 import java.io.Serializable;
 import java.util.Set;
@@ -21,6 +23,7 @@ import org.hibernate.validator.constraints.Length;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@JsonInclude(Include.NON_NULL)
 public class UserDto<ID extends Serializable>
     extends BaseDto<ID> implements Serializable {
 
@@ -71,4 +74,9 @@ public class UserDto<ID extends Serializable>
    * The Token.
    */
   private String token;
+
+  /**
+   * The Refresh token.
+   */
+  private String refreshToken;
 }

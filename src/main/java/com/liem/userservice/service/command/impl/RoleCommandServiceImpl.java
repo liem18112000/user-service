@@ -7,10 +7,12 @@ import com.liem.userservice.mapper.RoleMapper;
 import com.liem.userservice.repository.RoleRepository;
 import com.liem.userservice.service.command.RoleCommandService;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.stereotype.Service;
 
 /**
  * The type Role command service.
  */
+@Service
 public class RoleCommandServiceImpl
     extends BaseCommandService<
     Long, RoleEntity, RoleDto<Long>, RoleMapper, RoleRepository

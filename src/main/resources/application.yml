@@ -63,7 +63,11 @@ spring:
     secret: ${JWT_SECRET:secret}
     expiration: ${JWT_EXPIRATION:3600s}
     cache-duration: ${JWT_CACHE_DURATION:1200s}
-    white-list: /auth/ping/no-auth,/webjars/**,/v3/api-docs,/v3/api-docs.*,/v3/api-docs/**,/swagger-ui.*,/swagger-ui/**,/actuator/health,/login,/login/**,/register,/register/**
+    white-list: /,/explorer/**,/auth/ping/no-auth,/webjars/**,/v3/api-docs,/v3/api-docs.*,/v3/api-docs/**,/swagger-ui.*,/swagger-ui/**,/actuator/health,/auth/access-token,/auth/register
+  refresh-token:
+    secret: ${REFRESH_TOKEN_SECRET:refresh_secret}
+    expiration: ${REFRESH_TOKEN_EXPIRATION:30d}
+    cache-duration: ${REFRESH_TOKEN_CACHE_DURATION:12h}
   rabbitmq:
     host: ${RABBITMQ_HOST:localhost}
     username: ${RABBITMQ_USERNAME:guest}
